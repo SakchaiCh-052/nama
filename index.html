@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <body>
+  <!-- ส่วนหัวแยกออกมา -->
+  <div class="header">
+    💖 คุณจะเป็นอะไรในความสัมพันธ์ 💖
+  </div>
+  <style>
+    .header {
+      position: fixed; /* ติดอยู่บนหน้า */
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 1200px;
+      text-align: center;
+      font-size: 3rem;
+      font-weight: 700;
+      color: #ff6b9d;
+      padding: 1rem 0;
+      background: rgba(255,255,255,0.75);
+      backdrop-filter: blur(20px);
+      border-radius: 0 0 30px 30px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      z-index: 3;
+    }
+
+  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>💖 Keme Analyzer Pro+</title>
+<link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@300;400;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+    
+    /* อีโมจิลอยหลัง container */
+.floating-emoji {
+  position: absolute;
+  font-size: 2rem;
+  animation: float 10s linear infinite;
+  pointer-events: none; /* คลิกทะลุได้ */
+  opacity: 0.7;
+}
+
+@keyframes float {
+  0% { transform: translateY(100vh) translateX(0) rotate(0deg);}
+  50% { transform: translateY(50vh) translateX(20px) rotate(180deg);}
+  100% { transform: translateY(-10vh) translateX(-20px) rotate(360deg);}
+}
+
+body {
+  margin:0;
+  padding:0;
+  font-family:'Anuphan',sans-serif;
+  background: linear-gradient(135deg,#ffe4f3,#dbeafe);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  min-height:100vh;
+  overflow:hidden;
+  position:relative;
+}
+
+/* gradient เบลอหลัง container */
+body::before {
+  content:"";
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background: linear-gradient(120deg,#ff9ec1,#9ad1fc,#ffdd95,#c0ffc0);
+  background-size: 400% 400%;
+  animation: gradientShift 15s ease infinite;
+  z-index:0;
+  filter:blur(60px);
+  opacity:0.5;
+}
+
+@keyframes gradientShift {
+  0%{background-position:0% 50%;}
+  50%{background-position:100% 50%;}
+  100%{background-position:0% 50%;}
+}
+
+.container {
+  width:95%;
+  max-width:520px;
+  background: rgba(255,255,255,0.75);
+  backdrop-filter: blur(25px);
+  border-radius:30px;
+  padding:30px;
+  text-align:center;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+  transition: all 0.3s ease;
+  position:relative;
+  z-index:2;
+}
+
+.opt {
+  background: white;
+  padding: 28px 24px;      /* เพิ่มพื้นที่ให้ใหญ่ขึ้นประมาณ 2 เท่า */
+  border-radius: 25px;     /* โค้งใหญ่ขึ้น */
+  margin: 16px 0;          /* เว้นระยะห่างมากขึ้น */
+  cursor: pointer;
+  transition: transform 0.3s, background 0.3s, box-shadow 0.3s;
+  transform-origin: center;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15); /* เงาใหญ่เด่นขึ้น */
+  font-size: 2rem;         /* ขนาดตัวอักษรใหญ่ขึ้น 2 เท่า */
+  text-align: center;      /* จัดกลางแบบซีเอ็นเอ็น */
+  line-height: 1.4;        /* ให้ข้อความไม่ชิดกัน */
+}
+.opt:hover {
+  transform: scale(1.08);
+  background: #ff8cb1; 
+  box-shadow: 0 14px 30px rgba(0,0,0,0.25); /* hover เงาเด่นมาก */
+}
+  
+
+/* กล่องข้างนอกใหญ่ขึ้น */
+.wrap {
+  width: 95%;
+  max-width: 1000px;
+  background: rgba(255,255,255,0.75);
+  backdrop-filter: blur(25px);
+  border-radius: 30px;
+  padding: 50px 30px; /* เพิ่ม padding ด้านบน-ล่าง */
+  box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 2;
+   /* ความสูงกล่องใหญ่ขึ้น */
+}
+
+/* ขยายตัวอักษรคำถาม 50% */
+.qtxt {
+  font-size: 2rem; /* เดิม 1.1rem → เพิ่ม ~50% */
+  font-weight: 600;
+  color: #3b0764;
+  margin-bottom: 2rem;
+  line-height: 1.5;
+}
+
+/* ตัวเลือกคำตอบ */
+.opt {
+  font-size: 2rem; /* เพิ่มจากเดิม 0.95rem → ~70% */
+  padding: 20px 18px; /* กล่องใหญ่ขึ้น */
+  border-radius: 20px;
+}
+
+/* ผลลัพธ์ */
+.result-title {
+  font-size: 2.8rem; /* เดิม 2.2rem → เพิ่ม ~30% */
+  font-weight: 700;
+  color: #3b0764;
+  margin-bottom: 0.5rem;
+}
+
+.result-sub {
+  font-size: 2rem;   /* เดิม 1.1rem → เพิ่ม ~80% */
+  font-weight: 600;
+  color: #ff6b9d;
+}
+
+.result-desc {
+  font-size: 2rem; /* เดิม 0.9rem → เพิ่ม ~45% */
+  color: #6b4a7a;
+}
+
+.result-style {
+  font-size: 2rem; /* เดิม 0.85rem → เพิ่ม ~40% */
+  color: #a0698a;
+}
+
+.prog{height:6px;background:#f0e0ea;border-radius:99px;overflow:hidden;margin-bottom:1.5rem;}
+.bar{height:100%;background:linear-gradient(90deg,#ff6b9d,#7c3aed);border-radius:99px;transition:width .3s;}
+.qnum{font-size:13px;color:#a0698a;margin-bottom:.5rem;}
+.qtxt{font-size:1.1rem;font-weight:600;color:#3b0764;margin-bottom:1.25rem;line-height:1.5;}
+.opt{
+  background:white;
+  border:1px solid #f3d6ea;
+  border-radius:15px;
+  padding:.85rem 1.1rem;
+  margin-bottom:.6rem;
+  cursor:pointer;
+  font-size:.95rem;
+  color:#3b0764;
+  transition:transform .15s, background .15s;
+  text-align:left;
+}
+.opt:hover{transform:scale(1.02);background:#fff0f8;border-color:#ffb3d9;}
+.result-title{font-size:2.2rem;font-weight:600;color:#3b0764;margin-bottom:.2rem;}
+.result-sub{font-size:1.1rem;color:#ff6b9d;font-weight:600;margin-bottom:.5rem;}
+.result-desc{font-size:.9rem;color:#6b4a7a;margin-bottom:.25rem;line-height:1.6;}
+.result-style{font-size:.85rem;color:#a0698a;margin-bottom:1.25rem;}
+.chart-wrap{margin:1.25rem 0;max-height:260px;}
+.restart{
+  background:linear-gradient(90deg,#ff6b9d,#7c3aed);
+  border:none;
+  border-radius:15px;
+  padding:.85rem;
+  width:100%;
+  font-size:1rem;
+  font-weight:600;
+  color:white;
+  cursor:pointer;
+  margin-top:.5rem;
+  transition:opacity .15s;
+}
+.restart:hover{opacity:.85;}
+</style>
+</head>
+<body>
+    
+<div class="wrap" id="app"></div>
+
+<script>
+    const emojis = ["💖","🔥","🥺","😎","✨","💫"];
+for(let i=0;i<15;i++){
+  const span = document.createElement("span");
+  span.className = "floating-emoji";
+  span.style.left = Math.random()*90 + "vw";
+  span.style.animationDuration = 8 + Math.random()*7 + "s";
+  span.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+  document.body.appendChild(span);
+}
+const Q=[
+
+["เขาหายไปทั้งวัน 😶", [
+  ["ทักรัว 💬",{attach:3}],
+  ["รอแบบมีสติ 😌",{reserve:2}],
+  ["ไม่สน 😎",{avoid:3}],
+  ["งอนเงียบ 🥺",{sub:2}]
+]],
+["เลือกที่กิน 🍜", [
+  ["เลือกเอง 😎",{dom:3}],
+  ["ให้เขาเลือก 🥺",{sub:3}],
+  ["ช่วยกัน 🤝",{dom:1,sub:1}],
+  ["อะไรก็ได้ 🤷",{avoid:2}]
+]],
+["เวลาเขิน 😳", [
+  ["กลบเกลื่อน 😎",{dom:2}],
+  ["หลบหน้า 🥺",{sub:2}],
+  ["หัวเราะ 😆",{express:2}],
+  ["เงียบ 😶",{reserve:2}]
+]],
+["เวลาหึง 😒", [
+  ["ถามตรง 🔥",{dom:2}],
+  ["เก็บไว้ 🧊",{reserve:2}],
+  ["งอน 🥺",{sub:2}],
+  ["ปล่อย 😎",{avoid:2}]
+]],
+["เขาชมคุณ 💕", [
+  ["ชมกลับ 😎",{dom:1,attach:1}],
+  ["เขิน 🥺",{sub:2}],
+  ["ขอบคุณ 😊",{express:2}],
+  ["เฉยๆ 😶",{reserve:1}]
+]],
+["เดทแรก 🍰", [
+  ["นำเอง 😎",{dom:3}],
+  ["ตามเขา 🥺",{sub:3}],
+  ["ชิลๆ 😄",{express:1}],
+  ["เกร็ง 😶",{reserve:2}]
+]],
+["ทะเลาะกัน 😡", [
+  ["คุมสถานการณ์ 🎯",{dom:3}],
+  ["ยอมก่อน 🥺",{sub:3}],
+  ["อธิบาย 🧠",{express:2}],
+  ["หนี 🧊",{avoid:3}]
+]],
+["เวลาคิดถึง 💭", [
+  ["ทักเลย 💬",{attach:2}],
+  ["เก็บไว้ 😌",{reserve:2}],
+  ["ปล่อย 😎",{avoid:2}],
+  ["รอเขา 🥺",{sub:2}]
+]],
+["อยากได้ความรักแบบไหน 💘", [
+  ["ดูแลกัน 💖",{attach:2}],
+  ["เร้าใจ 🔥",{dom:2}],
+  ["สบายๆ 😌",{avoid:2}],
+  ["หวานๆ 🥺",{sub:2}]
+]],
+["เขางอน 😤", [
+  ["ง้อ 💖",{attach:2}],
+  ["อธิบาย 🧠",{express:2}],
+  ["ปล่อย 🧊",{avoid:2}],
+  ["งอนกลับ 😎",{dom:2}]
+]],
+["สถานะ 💍", [
+  ["ชัดเจน 💖",{attach:3}],
+  ["ค่อยเป็น 😌",{reserve:2}],
+  ["ไม่ซี 😎",{avoid:2}],
+  ["ตามเขา 🥺",{sub:2}]
+]],
+["เวลาว่าง 🕒", [
+  ["หาเขา 💕",{attach:2}],
+  ["พัก 😌",{reserve:2}],
+  ["เล่นเกม 🎮",{avoid:2}],
+  ["รอเขา 🥺",{sub:2}]
+]],
+["คุณเป็นคนแบบไหน 👀", [
+  ["ผู้นำ 😎",{dom:3}],
+  ["ผู้ตาม 🥺",{sub:3}],
+  ["กลางๆ 🤝",{dom:1,sub:1}],
+  ["อิสระ 😶",{avoid:2}]
+]],
+["แสดงความรัก 💕", [
+  ["บ่อย 💖",{express:3}],
+  ["บางครั้ง 😌",{reserve:2}],
+  ["ไม่ค่อย 😎",{avoid:2}],
+  ["เขิน 🥺",{sub:2}]
+]],
+["เวลาโดนแกล้ง 😏", [
+  ["สวนกลับ 🔥",{dom:2}],
+  ["เขิน 🥺",{sub:2}],
+  ["หัวเราะ 😆",{express:2}],
+  ["เฉย 😶",{reserve:2}]
+]],
+["รักระยะไกล 🌍", [
+  ["พยายาม 💖",{attach:3}],
+  ["พอไหว 😌",{reserve:2}],
+  ["ไม่เอา 😎",{avoid:2}],
+  ["แล้วแต่เขา 🥺",{sub:2}]
+]],
+["เวลาเสียใจ 😢", [
+  ["หาเขา 💕",{attach:2}],
+  ["เก็บไว้ 😶",{reserve:2}],
+  ["หายเอง 😎",{avoid:2}],
+  ["อยากให้ปลอบ 🥺",{sub:2}]
+]],
+["คุณหึงง่ายไหม 😶‍🌫️", [
+  ["ง่าย 🔥",{attach:2}],
+  ["นิดหน่อย 😌",{reserve:2}],
+  ["ไม่เลย 😎",{avoid:2}],
+  ["แล้วแต่เขา 🥺",{sub:2}]
+]],
+["เวลาคุยจริงจัง 🧠", [
+  ["เปิดหมด 💬",{express:3}],
+  ["เลือกพูด 🤏",{reserve:2}],
+  ["เลี่ยง 😶",{avoid:2}],
+  ["ให้เขาพูด 🥺",{sub:2}]
+]],
+["คุณชอบอะไร ❤️", [
+  ["ดูแลคนอื่น 💖",{attach:2}],
+  ["คุมเกม 😎",{dom:2}],
+  ["อยู่คนเดียว 😌",{avoid:2}],
+  ["ให้คนดูแล 🥺",{sub:2}]
+]],
+["เวลามีปัญหา ⚠️", [
+  ["แก้เอง 💪",{dom:2}],
+  ["ขอช่วย 🥺",{sub:2}],
+  ["คิดก่อน 🧠",{reserve:2}],
+  ["เลี่ยง 😎",{avoid:2}]
+]],
+["คุณโรแมนติกไหม 🌹", [
+  ["มาก 💖",{attach:2}],
+  ["กลางๆ 😌",{reserve:2}],
+  ["ไม่ 😎",{avoid:2}],
+  ["เขิน 🥺",{sub:2}]
+]],
+["อยากเจอเขาบ่อยไหม 🫶", [
+  ["มาก 💕",{attach:3}],
+  ["กลางๆ 😌",{reserve:2}],
+  ["ไม่ 😎",{avoid:2}],
+  ["แล้วแต่เขา 🥺",{sub:2}]
+]],
+["เวลาโดนชม 😳", [
+  ["มั่นใจ 😎",{dom:2}],
+  ["เขิน 🥺",{sub:2}],
+  ["ยิ้ม 😊",{express:2}],
+  ["เฉย 😶",{reserve:2}]
+]],
+["คุณเป็นคนยังไง 🤔", [
+  ["มั่นใจ 💥",{dom:2}],
+  ["อ่อนโยน 🥺",{sub:2}],
+  ["เปิดเผย 😄",{express:2}],
+  ["นิ่ง 😶",{reserve:2}]
+]],
+["ความสัมพันธ์ยาว ⏳", [
+  ["จริงจัง 💍",{attach:3}],
+  ["ค่อยดู 😌",{reserve:2}],
+  ["ไม่คิด 😎",{avoid:2}],
+  ["ตามเขา 🥺",{sub:2}]
+]],
+["เวลาอยู่ด้วย 👫", [
+  ["คุม 😎",{dom:2}],
+  ["ตาม 🥺",{sub:2}],
+  ["เท่าๆกัน 🤝",{express:1}],
+  ["เงียบ 😶",{reserve:2}]
+]],
+["คุณชอบโดนดูแลไหม 💞", [
+  ["ชอบ 🥺",{sub:3}],
+  ["กลางๆ 😌",{reserve:2}],
+  ["ไม่ 😎",{avoid:2}],
+  ["ฉันดูแลเอง 💪",{dom:2}]
+]],
+["คุณชอบดูแลคนไหม 💕", [
+  ["มาก 💖",{attach:3}],
+  ["บ้าง 😌",{reserve:2}],
+  ["ไม่ 😎",{avoid:2}],
+  ["แล้วแต่ 🥺",{sub:2}]
+]],
+["เวลาทะเลาะเล็ก 😒", [
+  ["เคลียร์ 🧠",{express:2}],
+  ["ปล่อย 😌",{reserve:2}],
+  ["หนี 😎",{avoid:2}],
+  ["งอน 🥺",{sub:2}]
+]],
+["คุณติดแฟนไหม 💞", [
+  ["มาก 💖",{attach:3}],
+  ["กลางๆ 😌",{reserve:2}],
+  ["ไม่ 😎",{avoid:2}],
+  ["แล้วแต่เขา 🥺",{sub:2}]
+]],
+["รักคืออะไร 💘", [
+  ["การดูแล 💖",{attach:2}],
+  ["ความสบายใจ 😌",{reserve:2}],
+  ["อิสระ 😎",{avoid:2}],
+  ["การพึ่งพา 🥺",{sub:2}]
+]],
+["เวลาคุณเจอคนใหม่ 🫵", [
+  ["นำคุย 😎",{dom:2}],
+  ["รอฟัง 🥺",{sub:2}],
+  ["เปิดใจ 💖",{express:2}],
+  ["เฉยๆ 😶",{reserve:2}]
+]],
+["คุณชอบเซอร์ไพรส์ไหม 🎁", [
+  ["ชอบมาก 💖",{attach:2}],
+  ["โอเค 😌",{reserve:2}],
+  ["ไม่ชอบ 😎",{avoid:2}],
+  ["แล้วแต่สถานการณ์ 🥺",{sub:2}]
+]],
+["เวลาเครียด 😓", [
+  ["ระบาย 💬",{express:2}],
+  ["เก็บไว้ 😶",{reserve:2}],
+  ["ชิลๆ 😎",{avoid:2}],
+  ["ต้องการใครสักคน 🥺",{sub:2}]
+]],
+["คุณชอบออกกำลังกายไหม 🏃‍♂️", [
+  ["ชอบนำ 😎",{dom:2}],
+  ["ทำตาม 🥺",{sub:2}],
+  ["ทำคนเดียว 😌",{avoid:2}],
+  ["ชอบไปกับคนรัก 💖",{attach:2}]
+]],
+["เวลามีเหตุไม่คาดฝัน ⚡", [
+  ["ควบคุมสถานการณ์ 🎯",{dom:2}],
+  ["พึ่งคนอื่น 🥺",{sub:2}],
+  ["ปรับตัวเอง 😌",{reserve:2}],
+  ["ตื่นเต้นและสนุก 💖",{express:2}]
+]]
+];
+
+const TYPES={
+"เมะ":[
+["เมะสายคุมเกม 😎","ชอบนำ ควบคุมสถานการณ์ และตัดสินใจเอง"],
+["เมะอบอุ่น 🔥","ดูเหมือนแรงแต่จริงๆ ใส่ใจและปกป้องเก่ง"],
+["เมะขี้แกล้ง 😏","ชอบแหย่คนที่ชอบให้เขิน"],
+["เมะเงียบ 🧊","นิ่งๆ ไม่พูดเยอะ แต่ดูน่าเกรง"],
+["เมะผู้นำ 👑","เป็นคนตัดสินใจหลักในความสัมพันธ์"],
+["เมะมั่นใจ 💥","รู้ว่าตัวเองต้องการอะไร"],
+["เมะสายดูแล 💖","ชอบดูแลคนรักแบบจริงจัง"],
+["เมะสายจริงจัง ⚡","ไม่เล่นเรื่องความรัก"],
+["เมะสายปกป้อง 🛡️","รู้สึกอยากปกป้องอีกฝ่ายเสมอ"],
+["เมะสายเท่ 😎","มีเสน่ห์แบบไม่ต้องพยายาม"],
+["เมะสายขี้เล่น 🎲","สนุกสนาน ชอบสร้างสีสัน"],
+["เมะสายลึก 🧠","คิดรอบคอบ เข้าใจคนอื่น"],
+["เมะสายใจดี 💖","อ่อนโยนและดูแลคนรัก"],
+["เมะสายเด็ดขาด ⚡","ตัดสินใจเร็ว ไม่ลังเล"],
+["เมะสายแฟนตาซี 🌟","ชอบจินตนาการ สร้างความสนุก"]
+],
+"เคะ":[
+["เคะขี้อ้อน 🥺","ต้องการความใส่ใจและการดูแล"],
+["เคะนุ่มนวล 💕","อ่อนโยน ใจดี และเข้าใจคนอื่น"],
+["เคะขี้เขิน 😳","เขินง่าย เวลาโดนแกล้ง"],
+["เคะสายพึ่งพา 🫶","รู้สึกปลอดภัยเมื่อมีคนดูแล"],
+["เคะสายเงียบ 😶","ไม่พูดมาก แต่รู้สึกลึก"],
+["เคะสายโรแมนติก 🌸","ชอบความรักหวานๆ"],
+["เคะสายอบอุ่น ❤️","เป็นคนใจดีและอ่อนโยน"],
+["เคะสายติดแฟน 💞","ชอบอยู่ใกล้คนรัก"],
+["เคะสายอารมณ์ 🎭","รู้สึกเยอะและแสดงออกชัด"],
+["เคะสายซื่อ 🐰","ใสๆ จริงใจ ไม่ซับซ้อน"],
+["เคะสายขี้เล่น 🎉","สนุกสนาน ชอบแกล้งและถูกแกล้ง"],
+["เคะสายคิดมาก 🤔","ละเอียด รอบคอบ และเป็นห่วงคนอื่น"],
+["เคะสายเอาใจ 🥰","ชอบทำให้คนรักมีความสุข"],
+["เคะสายขี้งอน 😤","งอนง่าย แต่ก็กลับมาง่าย"],
+["เคะสายเพ้อฝัน 🌙","จินตนาการสูง ชอบความหวาน"]
+],
+"สวิตช์":[
+["สวิตช์สมดุล ⚖️","เป็นได้ทั้งรุกและรับตามสถานการณ์"],
+["สวิตช์สายชิล 😎","ไม่ซีเรียส ปรับตัวเก่ง"],
+["สวิตช์สายเล่น 😏","ชอบเปลี่ยนบทบาทไปมา"],
+["สวิตช์สายลึก 🧠","เข้าใจทั้งสองฝั่ง"],
+["สวิตช์สายอิสระ 🕊️","ไม่ยึดติดบทบาท"],
+["สวิตช์สายคุมเกม 🔄","บางทีก็รุก บางทีก็คุมเกม"],
+["สวิตช์สายโรแมนติก 💫","มีทั้งความหวานและความนำ"],
+["สวิตช์สายนิ่ง 🧊","ดูสงบแต่เปลี่ยนได้"],
+["สวิตช์สายแพรวพราว ✨","มีหลายมิติในตัวเอง"],
+["สวิตช์สายบาลานซ์ 🎯","รู้ว่าเมื่อไหร่ควรเป็นอะไร"],
+["สวิตช์สายขี้เล่น 🎉","สนุกสนาน ชอบเปลี่ยนบทบาท"],
+["สวิตช์สายอบอุ่น 💖","ใส่ใจและดูแลทั้งสองฝั่ง"],
+["สวิตช์สายเด็ดขาด ⚡","ตัดสินใจเร็วเมื่อจำเป็น"],
+["สวิตช์สายลึกลับ 🌙","เก็บตัวแต่มีเสน่ห์ชวนค้นหา"],
+["สวิตช์สายแฟนตาซี 🌟","จินตนาการสูง ชอบสร้างสีสัน"]
+]
+};
+
+let idx=0;
+let S={dom:0,sub:0,attach:0,avoid:0,express:0,reserve:0};
+const app=document.getElementById("app");
+
+function render(){
+  if(idx>=Q.length){showResult();return;}
+  const pct=Math.round(idx/Q.length*100);
+  const q=Q[idx];
+  app.innerHTML=`
+    <div class="prog"><div class="bar" style="width:${pct}%"></div></div>
+    <div class="qnum">${idx+1} / ${Q.length}</div>
+    <div class="qtxt">${q[0]}</div>
+    ${q[1].map((o,i)=>`<div class="opt" onclick="pick(${i})">${o[0]}</div>`).join("")}
+  `;
+}
+
+function pick(i){
+  const sc=Q[idx][1][i][1];
+  for(const k in sc) S[k]+=sc[k];
+  idx++;
+  render();
+}
+
+function showResult(){
+  const total=Object.values(S).reduce((a,b)=>a+b,0)||1;
+  const domP=S.dom/total;
+  const subP=S.sub/total;
+  const attachP=S.attach/total;
+  const avoidP=S.avoid/total;
+  const expP=S.express/total;
+  const resP=S.reserve/total;
+  const di=(domP*1.1)-(subP*1.1);
+  const main=Math.abs(di)<0.05?"สวิตช์":di>0?"เมะ":"เคะ";
+  const pool=TYPES[main];
+  const picked=pool[Math.floor(Math.random()*pool.length)];
+  const emotIdx=attachP-avoidP;
+  const style=emotIdx>0.1?"เป็นคนผูกพันและให้ความสำคัญกับความรู้สึก":emotIdx<-0.1?"รักอิสระ ต้องการพื้นที่ส่วนตัว":"มีความสมดุลทางอารมณ์";
+
+  app.innerHTML=`
+    <div class="prog"><div class="bar" style="width:100%"></div></div>
+    <div class="result-title">${main}</div>
+    <div class="result-sub">${picked[0]}</div>
+    <div class="result-desc">${picked[1]}</div>
+    <div class="result-style">${style}</div>
+    <div class="chart-wrap"><canvas id="radar"></canvas></div>
+    <button class="restart" onclick="restart()">เล่นอีกครั้ง ↺</button>
+  `;
+
+  new Chart(document.getElementById("radar"),{
+    type:"radar",
+    data:{
+      labels:["เมะ","เคะ","ผูกพัน","อิสระ","แสดงออก","เก็บตัว"],
+      datasets:[{
+        data:[
+          Math.round(domP*100),Math.round(subP*100),Math.round(attachP*100),
+          Math.round(avoidP*100),Math.round(expP*100),Math.round(resP*100)
+        ],
+        borderColor:"#ff6b9d",
+        backgroundColor:"rgba(255,107,157,0.15)",
+        pointBackgroundColor:"#7c3aed",
+        borderWidth:2,
+        pointRadius:4
+      }]
+    },
+    options:{
+      responsive:true,
+      plugins:{legend:{display:false}},
+      scales:{r:{beginAtZero:true,max:100,ticks:{display:false},grid:{color:"rgba(180,130,200,0.25)"},pointLabels:{font:{size:13,family:"Anuphan"}}}}
+    }
+  });
+}
+
+function restart(){
+  idx=0;
+  S={dom:0,sub:0,attach:0,avoid:0,express:0,reserve:0};
+  render();
+}
+
+render();
+</script>
+</body>
+</html>
